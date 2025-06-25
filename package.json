@@ -1,0 +1,42 @@
+{
+  "name": "finance-tracker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tscheck": "tsc -b --noEmit",
+    "tscheck:watch": "tsc -b --noEmit --watch",
+    "format": "prettier --write .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/material": "^7.1.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@eslint/js": "^9.29.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.2.0",
+    "prettier": "^3.6.1",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.34.1",
+    "vite": "^7.0.0"
+  }
+}
