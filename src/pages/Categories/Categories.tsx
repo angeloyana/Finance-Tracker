@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
+import { createCategory, deleteCategory, getCategories, updateCategory } from '@/services/db';
 import type { Category } from '@/types/categories';
 
 import CategoriesFAB from './components/CategoriesFAB';
@@ -45,29 +46,17 @@ function Categories() {
   const [incomeCategories, setIncomeCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    setExpenseCategories([
-      {
-        id: 2,
-        type: 'expense',
-        name: 'Foods & Drinks',
-        total: 0,
-      },
-    ]);
-    setIncomeCategories([
-      {
-        id: 1,
-        type: 'income',
-        name: 'Salary',
-        total: 0,
-      },
-    ]);
+    (async () => {
+      setExpenseCategories(await getCategories({ type: 'expense' }));
+      setIncomeCategories(await getCategories({ type: 'income' }));
+    })();
   }, []);
 
   const handleCreateCategory = async (data: CreateCategoryData) => {
-    // TODO: insert category to database.
+    const id = await createCategory(data);
     const category: Category = {
       ...data,
-      id: (data.type === 'expense' ? expenseCategories : incomeCategories).length + 1,
+      id,
       total: 0,
     };
 
@@ -83,7 +72,7 @@ function Categories() {
   };
 
   const handleUpdateCategory = async (data: UpdateCategoryData, original: Category) => {
-    // TODO: update category from database.
+    await updateCategory(original.id, data);
     const updatedCategory: Category = {
       ...original,
       ...data,
@@ -101,7 +90,7 @@ function Categories() {
   };
 
   const handleDeleteCategory = async (original: Category) => {
-    // TODO: delete category from database.
+    await deleteCategory(original.id);
     const updateState = (setter: CategoriesSetter) => {
       setter((prev) => prev.filter((c) => c.id !== original.id));
     };

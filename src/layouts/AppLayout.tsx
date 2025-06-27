@@ -18,7 +18,7 @@ function NavigationBar() {
   return (
     <BottomNavigation
       value={activeRoute}
-      sx={{ position: 'absolute', bottom: 0, left: 0, width: '100%' }}
+      sx={{ position: 'fixed', bottom: 0, left: 0, width: '100%' }}
     >
       {routes.map(({ label, path, icon }) => (
         <BottomNavigationAction key={path} label={label} icon={icon} component={Link} to={path} />

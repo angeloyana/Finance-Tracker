@@ -6,3 +6,5 @@ export type Category = {
   name: string;
   total: number;
 };
+
+export type CategoryWithoutTotal = Omit<Category, 'total'>;

@@ -14,7 +14,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { type UpdateTransactionData, updateTransactionSchema } from '@/schemas/transactions';
-import type { Category } from '@/types/categories';
+import { getCategories } from '@/services/db';
+import type { CategoryWithoutTotal } from '@/types/categories';
 import type { Transaction } from '@/types/transactions';
 
 type Props = {
@@ -43,27 +44,16 @@ function UpdateTransaction({ transaction, open, onClose, onDelete, onSubmit }: P
   });
   const type = watch('type');
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryWithoutTotal[]>([]);
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === type),
     [type, categories]
   );
 
   useEffect(() => {
-    setCategories([
-      {
-        id: 2,
-        type: 'expense',
-        name: 'Foods & Drinks',
-        total: 0,
-      },
-      {
-        id: 1,
-        type: 'income',
-        name: 'Salary',
-        total: 0,
-      },
-    ]);
+    (async () => {
+      setCategories(await getCategories({ select: ['type', 'name'] }));
+    })();
   }, []);
 
   useEffect(() => {

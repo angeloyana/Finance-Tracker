@@ -7,6 +7,13 @@ import AddTransaction from '@/components/Transactions/AddTransaction';
 import TransactionsList from '@/components/Transactions/TransactionsList';
 import UpdateTransaction from '@/components/Transactions/UpdateTransaction';
 import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
+import {
+  addTransaction,
+  deleteTransaction,
+  getTransaction,
+  getTransactions,
+  updateTransaction,
+} from '@/services/db';
 import type { Transaction } from '@/types/transactions';
 
 import HomeFAB from './components/HomeFAB';
@@ -17,53 +24,27 @@ function Home() {
   const [transactionToUpdate, setTransactionToUpdate] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    setTransactions([
-      {
-        id: 2,
-        type: 'expense',
-        note: 'Dinner',
-        amount: 150,
-        createdAt: new Date(),
-        categoryId: 2,
-        category: 'Foods & Drinks',
-      },
-      {
-        id: 1,
-        type: 'income',
-        note: 'IT Company',
-        amount: 20000,
-        createdAt: new Date(),
-        categoryId: 1,
-        category: 'Salary',
-      },
-    ]);
+    (async () => {
+      setTransactions(await getTransactions({ desc: true, limit: 5 }));
+    })();
   }, []);
 
   const handleAddTransaction = async (data: AddTransactionData) => {
-    // TODO: insert and retrieve transaction from database.
-    const transaction: Transaction = {
-      ...data,
-      id: transactions.length + 1,
-      category: data.categoryId === 1 ? 'Salary' : data.categoryId === 2 ? 'Foods & Drinks' : null,
-      createdAt: new Date(),
-    };
-    setTransactions((prev) => [transaction, ...prev]);
+    const id = await addTransaction(data);
+    const transaction = (await getTransaction(id))!;
+    setTransactions((prev) => [transaction, ...(prev.length >= 5 ? prev.slice(0, -1) : prev)]);
   };
 
   const handleUpdateTransaction = async (data: UpdateTransactionData, original: Transaction) => {
-    // TODO: update and retrieve transaction from database.
-    const updatedTransaction = {
-      ...original,
-      ...data,
-      category: data.categoryId === 1 ? 'Salary' : data.categoryId === 2 ? 'Foods & Drinks' : null,
-    };
+    await updateTransaction(original.id, data);
+    const updatedTransaction = (await getTransaction(original.id))!;
     setTransactions((prev) =>
       prev.map((tx) => (tx.id !== updatedTransaction.id ? tx : updatedTransaction))
     );
   };
 
   const handleDeleteTransaction = async (original: Transaction) => {
-    // TODO: delete transaction from database.
+    await deleteTransaction(original.id);
     setTransactions((prev) => prev.filter((tx) => tx.id !== original.id));
   };
 

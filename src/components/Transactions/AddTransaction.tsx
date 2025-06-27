@@ -13,7 +13,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { type AddTransactionData, addTransactionSchema } from '@/schemas/transactions';
-import type { Category } from '@/types/categories';
+import { getCategories } from '@/services/db';
+import type { CategoryWithoutTotal } from '@/types/categories';
 
 type Props = {
   open: boolean;
@@ -39,27 +40,16 @@ function AddTransaction({ open, onClose, onSubmit }: Props) {
   });
   const type = watch('type');
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryWithoutTotal[]>([]);
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === type),
     [type, categories]
   );
 
   useEffect(() => {
-    setCategories([
-      {
-        id: 2,
-        type: 'expense',
-        name: 'Foods & Drinks',
-        total: 0,
-      },
-      {
-        id: 1,
-        type: 'income',
-        name: 'Salary',
-        total: 0,
-      },
-    ]);
+    (async () => {
+      setCategories(await getCategories({ select: ['type', 'name'] }));
+    })();
   }, []);
 
   useEffect(() => {
