@@ -20,7 +20,7 @@ type Props = {
 
 function TransactionsList({ title, transactions, onClickTransaction }: Props) {
   return (
-    <List subheader={title ? <ListSubheader>{title}</ListSubheader> : undefined}>
+    <List subheader={title ? <ListSubheader>{title}</ListSubheader> : undefined} sx={{ mb: 15 }}>
       {transactions.map((transaction, index) => {
         const { id, type, note, amount, createdAt, category } = transaction;
 
