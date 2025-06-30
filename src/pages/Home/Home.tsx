@@ -10,29 +10,42 @@ import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transa
 import {
   addTransaction,
   deleteTransaction,
+  getTotals,
   getTransaction,
   getTransactions,
   updateTransaction,
 } from '@/services/db';
+import type { Totals } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 
 import HomeFAB from './components/HomeFAB';
+import Overview from './components/Overview';
 
 function Home() {
+  const [totals, setTotals] = useState<Totals>({
+    expense: 0,
+    income: 0,
+  });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [transactionToUpdate, setTransactionToUpdate] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    (async () => {
-      setTransactions(await getTransactions({ desc: true, limit: 5 }));
-    })();
+    Promise.all([getTotals(), getTransactions()]).then(([result1, result2]) => {
+      setTotals(result1);
+      setTransactions(result2);
+    });
   }, []);
 
   const handleAddTransaction = async (data: AddTransactionData) => {
     const id = await addTransaction(data);
     const transaction = (await getTransaction(id))!;
     setTransactions((prev) => [transaction, ...(prev.length >= 5 ? prev.slice(0, -1) : prev)]);
+
+    setTotals((prev) => ({
+      ...prev,
+      [transaction.type]: prev[transaction.type] + transaction.amount,
+    }));
   };
 
   const handleUpdateTransaction = async (data: UpdateTransactionData, original: Transaction) => {
@@ -41,11 +54,29 @@ function Home() {
     setTransactions((prev) =>
       prev.map((tx) => (tx.id !== updatedTransaction.id ? tx : updatedTransaction))
     );
+
+    if (data.type !== original.type) {
+      setTotals((prev) => ({
+        ...prev,
+        [original.type]: prev[original.type] - original.amount,
+        [data.type]: prev[data.type] + data.amount,
+      }));
+    } else if (data.amount !== original.amount) {
+      setTotals((prev) => ({
+        ...prev,
+        [original.type]: prev[original.type] - original.amount + data.amount,
+      }));
+    }
   };
 
   const handleDeleteTransaction = async (original: Transaction) => {
     await deleteTransaction(original.id);
     setTransactions((prev) => prev.filter((tx) => tx.id !== original.id));
+
+    setTotals((prev) => ({
+      ...prev,
+      [original.type]: prev[original.type] - original.amount,
+    }));
   };
 
   return (
@@ -58,6 +89,7 @@ function Home() {
         </Toolbar>
       </AppBar>
       <Toolbar />
+      <Overview totals={totals} />
       <TransactionsList
         title="Recent Transactions"
         transactions={transactions}

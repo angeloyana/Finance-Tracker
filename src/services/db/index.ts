@@ -9,6 +9,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
 import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
 import type { Category } from '@/types/categories';
+import type { Totals } from '@/types/common';
 import type { DateRange, DBResult, DBSelect, EntryType } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 
@@ -29,6 +30,19 @@ export async function initDatabase() {
   db = await sqlite.createConnection(DB_NAME, false, 'no-encryption', VERSION, false);
 
   await db.open();
+}
+
+export async function getTotals(): Promise<Totals> {
+  const sql = `
+  SELECT
+    COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expense,
+    COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS income
+  FROM transactions`;
+  const result = await db!.query(sql);
+  const totals = result.values?.[0];
+
+  if (!totals) return { expense: 0, income: 0 };
+  return totals;
 }
 
 export async function createCategory(data: CreateCategoryData): Promise<number> {
