@@ -79,9 +79,10 @@ export async function deleteCategory(id: number): Promise<void> {
 }
 
 export async function addTransaction(data: AddTransactionData): Promise<number> {
-  const { type, note, amount, categoryId } = data;
-  const sql = 'INSERT INTO transactions (type, note, amount, category_id) VALUES (?,?,?,?)';
-  const result = await db!.run(sql, [type, note, amount, categoryId]);
+  const { type, note, amount, categoryId, createdAt } = data;
+  const sql =
+    'INSERT INTO transactions (type, note, amount, category_id, created_at) VALUES (?,?,?,?,?)';
+  const result = await db!.run(sql, [type, note, amount, categoryId, createdAt.unix()]);
   if (typeof result.changes?.lastId !== 'number') throw new Error('Insert category failed.');
   return result.changes.lastId;
 }
@@ -119,7 +120,7 @@ export async function getTransaction<T extends DBSelect<Transaction>>(
 
   return {
     ...tx,
-    createdAt: new Date(tx.createdAt),
+    createdAt: dayjs(tx.createdAt),
   } as DBResult<Transaction, T>;
 }
 
@@ -188,7 +189,7 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
   const result = await db!.query(sql, params);
   return (result.values ?? []).map((tx) => ({
     ...tx,
-    createdAt: new Date(tx.createdAt),
+    createdAt: dayjs(tx.createdAt),
   })) as DBResult<Transaction, T>[];
 }
 
@@ -205,10 +206,10 @@ export async function getTransactionsDateRange(): Promise<DateRange> {
 }
 
 export async function updateTransaction(id: number, data: UpdateTransactionData): Promise<void> {
-  const { type, note, amount, categoryId } = data;
+  const { type, note, amount, categoryId, createdAt } = data;
   const sql =
-    'UPDATE transactions SET type = ?, note = ?, amount = ?, category_id = ? WHERE id = ?';
-  await db!.run(sql, [type, note, amount, categoryId, id]);
+    'UPDATE transactions SET type = ?, note = ?, amount = ?, category_id = ?, created_at = ? WHERE id = ?';
+  await db!.run(sql, [type, note, amount, categoryId, createdAt.unix(), id]);
 }
 
 export async function deleteTransaction(id: number): Promise<void> {

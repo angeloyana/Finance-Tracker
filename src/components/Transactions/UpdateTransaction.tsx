@@ -10,6 +10,10 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -63,6 +67,7 @@ function UpdateTransaction({ transaction, open, onClose, onDelete, onSubmit }: P
         note: transaction.note,
         amount: transaction.amount,
         categoryId: transaction.categoryId,
+        createdAt: transaction.createdAt,
       });
     }
   }, [open]);
@@ -93,7 +98,7 @@ function UpdateTransaction({ transaction, open, onClose, onDelete, onSubmit }: P
             <CloseIcon />
           </IconButton>
           <Typography variant="h6" component="div" flexGrow={1}>
-            Add Transaction
+            Update Transaction
           </Typography>
           <IconButton aria-label="delete" onClick={handleDelete} color="inherit">
             <DeleteIcon />
@@ -167,6 +172,23 @@ function UpdateTransaction({ transaction, open, onClose, onDelete, onSubmit }: P
             htmlInput: { step: 0.01 },
           }}
           {...register('amount', { valueAsNumber: true })}
+        />
+        <Controller
+          name="createdAt"
+          control={control}
+          render={({ field }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Date"
+                viewRenderers={{
+                  hours: renderTimeViewClock,
+                  minutes: renderTimeViewClock,
+                  seconds: renderTimeViewClock,
+                }}
+                {...field}
+              />
+            </LocalizationProvider>
+          )}
         />
       </Box>
     </Dialog>

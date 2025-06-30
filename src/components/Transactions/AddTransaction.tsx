@@ -9,6 +9,11 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -53,7 +58,12 @@ function AddTransaction({ open, onClose, onSubmit }: Props) {
   }, []);
 
   useEffect(() => {
-    if (open) reset();
+    if (open)
+      reset({
+        type: 'expense',
+        categoryId: null,
+        createdAt: dayjs(),
+      });
   }, [open]);
 
   return (
@@ -142,6 +152,23 @@ function AddTransaction({ open, onClose, onSubmit }: Props) {
             htmlInput: { step: 0.01 },
           }}
           {...register('amount', { valueAsNumber: true })}
+        />
+        <Controller
+          name="createdAt"
+          control={control}
+          render={({ field }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Date"
+                viewRenderers={{
+                  hours: renderTimeViewClock,
+                  minutes: renderTimeViewClock,
+                  seconds: renderTimeViewClock,
+                }}
+                {...field}
+              />
+            </LocalizationProvider>
+          )}
         />
       </Box>
     </Dialog>

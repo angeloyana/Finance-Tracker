@@ -1,3 +1,5 @@
+import type { Dayjs } from 'dayjs';
+
 import type { EntryType } from './common';
 
 export type Transaction = {
@@ -5,7 +7,7 @@ export type Transaction = {
   type: EntryType;
   note: string | null;
   amount: number;
-  createdAt: Date;
+  createdAt: Dayjs;
   categoryId: number | null;
   category: string | null;
 };
