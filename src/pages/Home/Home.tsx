@@ -31,10 +31,12 @@ function Home() {
   const [transactionToUpdate, setTransactionToUpdate] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    Promise.all([getTotals(), getTransactions()]).then(([result1, result2]) => {
-      setTotals(result1);
-      setTransactions(result2);
-    });
+    Promise.all([getTotals(), getTransactions({ limit: 5, desc: true })]).then(
+      ([result1, result2]) => {
+        setTotals(result1);
+        setTransactions(result2);
+      }
+    );
   }, []);
 
   const handleAddTransaction = async (data: AddTransactionData) => {
