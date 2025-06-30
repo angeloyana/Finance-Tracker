@@ -4,11 +4,12 @@ import {
   SQLiteConnection,
   type SQLiteDBConnection,
 } from '@capacitor-community/sqlite';
+import dayjs, { type Dayjs } from 'dayjs';
 
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
 import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
 import type { Category } from '@/types/categories';
-import type { DBResult, DBSelect, EntryType } from '@/types/common';
+import type { DateRange, DBResult, DBSelect, EntryType } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 
 import { upgrades } from './upgrades';
@@ -126,6 +127,11 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
   select?: T;
   desc?: boolean;
   limit?: number;
+  where?: {
+    type?: EntryType;
+    note?: string;
+    createdAt?: Dayjs;
+  };
 }): Promise<DBResult<Transaction, T>[]> {
   const select =
     options?.select instanceof Array
@@ -148,6 +154,31 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
   LEFT JOIN categories AS c ON t.category_id = c.id`;
   const params = [];
 
+  const typeFilter = options?.where?.type;
+  const noteFilter = options?.where?.note;
+  const createdAtFilter = options?.where?.createdAt;
+  if (typeFilter || noteFilter || createdAtFilter) {
+    sql += ' WHERE ';
+    const filters: string[] = [];
+
+    if (typeFilter) {
+      filters.push('t.type = ?');
+      params.push(typeFilter);
+    }
+
+    if (noteFilter) {
+      filters.push('t.note LIKE ?');
+      params.push(`%${noteFilter}%`);
+    }
+
+    if (createdAtFilter) {
+      filters.push('t.created_at BETWEEN ? AND ?');
+      params.push(createdAtFilter.startOf('day').unix());
+      params.push(createdAtFilter.endOf('day').unix());
+    }
+
+    sql += filters.join(' AND ');
+  }
   if (options?.desc) sql += ' ORDER BY createdAt DESC';
   if (typeof options?.limit === 'number') {
     sql += ' LIMIT ?';
@@ -159,6 +190,18 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
     ...tx,
     createdAt: new Date(tx.createdAt),
   })) as DBResult<Transaction, T>[];
+}
+
+export async function getTransactionsDateRange(): Promise<DateRange> {
+  const sql = 'SELECT MIN(created_at) AS min, MAX(created_at) AS max FROM transactions';
+  const result = await db!.query(sql);
+  const range = result.values?.[0];
+
+  if (!range) return { min: null, max: null };
+  return {
+    min: range.min ? dayjs(range.min * 1000) : null,
+    max: range.max ? dayjs(range.max * 1000) : null,
+  };
 }
 
 export async function updateTransaction(id: number, data: UpdateTransactionData): Promise<void> {

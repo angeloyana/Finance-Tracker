@@ -1,4 +1,11 @@
+import type { Dayjs } from 'dayjs';
+
 export type EntryType = 'expense' | 'income';
+
+export type DateRange = {
+  min: Dayjs | null;
+  max: Dayjs | null;
+};
 
 export type DBSelect<T> = Array<Exclude<keyof T, 'id'>>;
 

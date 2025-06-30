@@ -25,6 +25,9 @@
     "@hookform/resolvers": "^5.1.1",
     "@mui/icons-material": "^7.1.2",
     "@mui/material": "^7.1.2",
+    "@mui/x-date-pickers": "^8.6.0",
+    "dayjs": "^1.11.13",
+    "lodash": "^4.17.21",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.58.1",
@@ -35,6 +38,7 @@
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",
     "@eslint/js": "^9.29.0",
+    "@types/lodash": "^4.17.19",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
