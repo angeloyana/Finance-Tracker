@@ -4,6 +4,7 @@ import AppLayout from './layouts/AppLayout';
 import Categories from './pages/Categories';
 import Home from './pages/Home';
 import Landing from './pages/Landing';
+import Settings from './pages/Settings';
 import Transactions from './pages/Transactions';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="home" element={<Home />} />
           <Route path="categories" element={<Categories />} />
           <Route path="transactions" element={<Transactions />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

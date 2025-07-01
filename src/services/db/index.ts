@@ -6,6 +6,7 @@ import {
 } from '@capacitor-community/sqlite';
 import dayjs, { type Dayjs } from 'dayjs';
 
+import { type BackupData, backupSchema } from '@/schemas/backup';
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
 import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
 import type { Category } from '@/types/categories';
@@ -229,6 +230,33 @@ export async function updateTransaction(id: number, data: UpdateTransactionData)
 export async function deleteTransaction(id: number): Promise<void> {
   const sql = 'DELETE FROM transactions WHERE id = ?';
   await db!.run(sql, [id]);
+}
+
+export async function backupDatabase(): Promise<BackupData> {
+  const [result1, result2] = await Promise.all([
+    db!.query('SELECT * FROM categories'),
+    db!.query('SELECT * FROM transactions'),
+  ]);
+
+  return {
+    categories: result1.values,
+    transactions: result2.values,
+  } as BackupData;
+}
+
+export async function restoreDatabase(backupData: unknown): Promise<void> {
+  const { categories, transactions } = backupSchema.parse(backupData);
+  await db!.executeTransaction([
+    ...categories.map(({ id, type, name }) => ({
+      statement: 'INSERT INTO categories (id, type, name) VALUES (?,?,?)',
+      values: [id, type, name],
+    })),
+    ...transactions.map(({ id, type, note, amount, category_id, created_at }) => ({
+      statement:
+        'INSERT INTO transactions (id, type, note, amount, category_id, created_at) VALUES (?,?,?,?,?,?)',
+      values: [id, type, note, amount, category_id, created_at],
+    })),
+  ]);
 }
 
 export async function closeDatabase() {
