@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import AddTransaction from '@/components/Transactions/AddTransaction';
 import TransactionsList from '@/components/Transactions/TransactionsList';
 import UpdateTransaction from '@/components/Transactions/UpdateTransaction';
-import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
 import {
   addTransaction,
   deleteTransaction,
@@ -17,7 +16,8 @@ import {
   getTransactions,
   getTransactionsDateRange,
   updateTransaction,
-} from '@/services/db';
+} from '@/lib/db';
+import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
 import type { DateRange, EntryType } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 

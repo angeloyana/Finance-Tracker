@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
-import { backupDatabase, restoreDatabase } from '@/services/db';
+import { backupDatabase, restoreDatabase } from '@/lib/db';
 
 async function getPermissions(): Promise<boolean> {
   const { publicStorage } = await Filesystem.checkPermissions();

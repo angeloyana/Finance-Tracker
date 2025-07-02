@@ -17,8 +17,8 @@ import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+import { getCategories } from '@/lib/db';
 import { type AddTransactionData, addTransactionSchema } from '@/schemas/transactions';
-import { getCategories } from '@/services/db';
 import type { CategoryWithoutTotal } from '@/types/categories';
 
 type Props = {

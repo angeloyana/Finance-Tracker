@@ -17,8 +17,8 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+import { getCategories } from '@/lib/db';
 import { type UpdateTransactionData, updateTransactionSchema } from '@/schemas/transactions';
-import { getCategories } from '@/services/db';
 import type { CategoryWithoutTotal } from '@/types/categories';
 import type { Transaction } from '@/types/transactions';
 

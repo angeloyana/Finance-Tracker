@@ -6,7 +6,7 @@ import { defineCustomElements as jeepSqlite } from 'jeep-sqlite/loader';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { closeDatabase, initDatabase } from '@/services/db';
+import { closeDatabase, initDatabase } from '@/lib/db';
 
 import App from './App.tsx';
 

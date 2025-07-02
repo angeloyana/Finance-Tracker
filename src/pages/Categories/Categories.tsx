@@ -6,8 +6,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
+import { createCategory, deleteCategory, getCategories, updateCategory } from '@/lib/db';
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
-import { createCategory, deleteCategory, getCategories, updateCategory } from '@/services/db';
 import type { Category } from '@/types/categories';
 
 import CategoriesFAB from './components/CategoriesFAB';
