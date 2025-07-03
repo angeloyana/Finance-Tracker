@@ -16,7 +16,11 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
+import currencies, { type CurrencyCodes } from '@/data/currencies';
 import { backupDatabase, restoreDatabase } from '@/lib/db';
+import settings from '@/lib/settings';
+
+import CurrencyPicker from './components/CurrencyPicker';
 
 async function getPermissions(): Promise<boolean> {
   const { publicStorage } = await Filesystem.checkPermissions();
@@ -36,10 +40,17 @@ type SnackbarType = {
 };
 
 function Settings() {
+  const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false);
+  const [currencyCode, setCurrencyCode] = useState(settings.get('currencyCode'));
   const [snackbar, setSnackbar] = useState<SnackbarType>({
     message: '',
     open: false,
   });
+
+  const handleChangeCurrency = async (value: CurrencyCodes) => {
+    await settings.set('currencyCode', value);
+    setCurrencyCode(value);
+  };
 
   const handleBackup = async () => {
     if (!(await getPermissions())) {
@@ -100,6 +111,13 @@ function Settings() {
         </Toolbar>
       </AppBar>
       <Toolbar />
+      <List subheader={<ListSubheader>General</ListSubheader>}>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => setCurrencyPickerOpen(true)}>
+            <ListItemText primary="Currency" secondary={currencies[currencyCode].name} />
+          </ListItemButton>
+        </ListItem>
+      </List>
       <List subheader={<ListSubheader>Backup & Restore</ListSubheader>}>
         <ListItem disablePadding divider>
           <ListItemButton>
@@ -128,6 +146,12 @@ function Settings() {
           </ListItemButton>
         </ListItem>
       </List>
+      <CurrencyPicker
+        open={currencyPickerOpen}
+        value={currencyCode}
+        onClose={() => setCurrencyPickerOpen(false)}
+        onChange={handleChangeCurrency}
+      />
       <Snackbar
         open={snackbar.open}
         message={snackbar.message}

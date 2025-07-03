@@ -1,16 +1,19 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
+import currencies from '@/data/currencies';
+import settings from '@/lib/settings';
+
 dayjs.extend(isSameOrAfter);
 
 export function formatCurrency(n: number) {
-  return (
-    '$' +
-    n.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-  );
+  const code = settings.get('currencyCode');
+  const { locale } = currencies[code];
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: code,
+  }).format(n);
 }
 
 export function formatDate(date: Dayjs) {

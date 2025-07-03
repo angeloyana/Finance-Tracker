@@ -7,6 +7,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { closeDatabase, initDatabase } from '@/lib/db';
+import settings from '@/lib/settings';
 
 import App from './App.tsx';
 
@@ -18,6 +19,7 @@ import App from './App.tsx';
     await customElements.whenDefined('jeep-sqlite');
   }
 
+  await settings.init();
   await initDatabase();
   window.addEventListener('beforeunload', closeDatabase);
 
