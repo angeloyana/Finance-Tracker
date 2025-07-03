@@ -9,9 +9,11 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { MuiColorInput } from 'mui-color-input';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
+import IconPicker from '@/components/IconPicker';
 import { type UpdateCategoryData, updateCategorySchema } from '@/schemas/categories';
 import type { Category } from '@/types/categories';
 
@@ -27,6 +29,7 @@ function UpdateCategory({ category, open, onClose, onDelete, onSubmit }: Props) 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isDirty },
     reset,
   } = useForm({
@@ -37,6 +40,8 @@ function UpdateCategory({ category, open, onClose, onDelete, onSubmit }: Props) 
     if (open && category)
       reset({
         name: category.name,
+        color: category.color,
+        icon: category.icon,
       });
   }, [open]);
 
@@ -88,6 +93,26 @@ function UpdateCategory({ category, open, onClose, onDelete, onSubmit }: Props) 
           error={!!errors.name}
           helperText={errors.name?.message}
           {...register('name')}
+        />
+        <Controller
+          name="color"
+          control={control}
+          render={({ field }) => (
+            <MuiColorInput
+              label="Color"
+              format="hex"
+              isAlphaHidden={true}
+              fallbackValue="#1976D2"
+              error={!!errors.color}
+              helperText={errors.color?.message}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="icon"
+          control={control}
+          render={({ field }) => <IconPicker label="Icon" {...field} />}
         />
       </Box>
     </Dialog>

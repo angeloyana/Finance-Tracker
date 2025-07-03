@@ -5,7 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 
-import TypeAvatar from '@/components/TypeAvatar';
+import CategoryAvatar from '@/components/CategoryAvatar';
 import type { Category } from '@/types/categories';
 import { formatCurrency } from '@/utils';
 
@@ -19,13 +19,13 @@ function CategoriesList({ title, categories, onClickCategory }: Props) {
   return (
     <List subheader={title ? <ListSubheader>{title}</ListSubheader> : undefined}>
       {categories.map((category, index) => {
-        const { id, type, name, total } = category;
+        const { id, name, color, icon, total } = category;
 
         return (
           <ListItem key={id} divider={index < categories.length - 1} disablePadding>
             <ListItemButton onClick={() => onClickCategory(category)}>
               <ListItemAvatar>
-                <TypeAvatar type={type} />
+                <CategoryAvatar color={color} icon={icon} />
               </ListItemAvatar>
               <ListItemText primary={name} secondary={formatCurrency(total)} />
             </ListItemButton>

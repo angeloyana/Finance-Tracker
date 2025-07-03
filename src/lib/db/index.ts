@@ -47,8 +47,8 @@ export async function getTotals(): Promise<Totals> {
 }
 
 export async function createCategory(data: CreateCategoryData): Promise<number> {
-  const sql = 'INSERT INTO categories (type, name) VALUES (?,?)';
-  const result = await db!.run(sql, [data.type, data.name]);
+  const sql = 'INSERT INTO categories (type, name, color, icon) VALUES (?,?,?,?)';
+  const result = await db!.run(sql, [data.type, data.name, data.color, data.icon]);
   if (typeof result.changes?.lastId !== 'number') throw new Error('Insert category failed.');
   return result.changes.lastId;
 }
@@ -60,11 +60,13 @@ export async function getCategories<T extends DBSelect<Category>>(options?: {
   const select =
     options?.select instanceof Array
       ? [...new Set(options.select)]
-      : (['type', 'name', 'total'] as T);
+      : (['type', 'name', 'color', 'icon', 'total'] as T);
 
   const columns = {
     type: 'c.type',
     name: 'c.name',
+    color: 'c.color',
+    icon: 'c.icon',
     total: 'COALESCE(SUM(t.amount), 0) AS total',
   };
 
@@ -84,8 +86,8 @@ export async function getCategories<T extends DBSelect<Category>>(options?: {
 }
 
 export async function updateCategory(id: number, data: UpdateCategoryData): Promise<void> {
-  const sql = 'UPDATE categories SET name = ? WHERE id = ?';
-  await db!.run(sql, [data.name, id]);
+  const sql = 'UPDATE categories SET name = ?, color = ?, icon = ? WHERE id = ?';
+  await db!.run(sql, [data.name, data.color, data.icon, id]);
 }
 
 export async function deleteCategory(id: number): Promise<void> {
@@ -111,7 +113,16 @@ export async function getTransaction<T extends DBSelect<Transaction>>(
   const select =
     options?.select instanceof Array
       ? [...new Set(options.select)]
-      : (['type', 'note', 'amount', 'createdAt', 'categoryId', 'category'] as T);
+      : ([
+          'type',
+          'note',
+          'amount',
+          'createdAt',
+          'categoryId',
+          'category',
+          'categoryColor',
+          'categoryIcon',
+        ] as T);
 
   const columns = {
     type: 't.type',
@@ -120,6 +131,8 @@ export async function getTransaction<T extends DBSelect<Transaction>>(
     createdAt: 't.created_at * 1000 AS createdAt',
     categoryId: 'c.id AS categoryId',
     category: 'c.name AS category',
+    categoryColor: 'c.color AS categoryColor',
+    categoryIcon: 'c.icon AS categoryIcon',
   };
 
   const sql = `
@@ -152,7 +165,16 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
   const select =
     options?.select instanceof Array
       ? [...new Set(options.select)]
-      : (['type', 'note', 'amount', 'createdAt', 'categoryId', 'category'] as T);
+      : ([
+          'type',
+          'note',
+          'amount',
+          'createdAt',
+          'categoryId',
+          'category',
+          'categoryColor',
+          'categoryIcon',
+        ] as T);
 
   const columns = {
     type: 't.type',
@@ -161,6 +183,8 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
     createdAt: 't.created_at * 1000 AS createdAt',
     categoryId: 'c.id AS categoryId',
     category: 'c.name AS category',
+    categoryColor: 'c.color AS categoryColor',
+    categoryIcon: 'c.icon AS categoryIcon',
   };
 
   let sql = `
@@ -247,9 +271,9 @@ export async function backupDatabase(): Promise<BackupData> {
 export async function restoreDatabase(backupData: unknown): Promise<void> {
   const { categories, transactions } = backupSchema.parse(backupData);
   await db!.executeTransaction([
-    ...categories.map(({ id, type, name }) => ({
-      statement: 'INSERT INTO categories (id, type, name) VALUES (?,?,?)',
-      values: [id, type, name],
+    ...categories.map(({ id, type, name, color, icon }) => ({
+      statement: 'INSERT INTO categories (id, type, name, color, icon) VALUES (?,?,?,?,?)',
+      values: [id, type, name, color, icon],
     })),
     ...transactions.map(({ id, type, note, amount, category_id, created_at }) => ({
       statement:

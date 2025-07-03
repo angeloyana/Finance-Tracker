@@ -8,6 +8,8 @@ export const upgrades: capSQLiteVersionUpgrade[] = [
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          name TEXT NOT NULL,
          type TEXT NOT NULL CHECK (type IN ('expense', 'income')),
+         color TEXT NOT NULL,
+         icon TEXT NOT NULL,
          CONSTRAINT UQ_Categories_Name_Type UNIQUE(name, type)
        )`,
       `CREATE TABLE IF NOT EXISTS transactions (

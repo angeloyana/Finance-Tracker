@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Typography from '@mui/material/Typography';
 
-import TypeAvatar from '@/components/TypeAvatar';
+import CategoryAvatar from '@/components/CategoryAvatar';
 import type { Transaction } from '@/types/transactions';
 import { formatCurrency, formatDate } from '@/utils';
 
@@ -22,13 +22,14 @@ function TransactionsList({ title, transactions, onClickTransaction }: Props) {
   return (
     <List subheader={title ? <ListSubheader>{title}</ListSubheader> : undefined} sx={{ mb: 15 }}>
       {transactions.map((transaction, index) => {
-        const { id, type, note, amount, createdAt, category } = transaction;
+        const { id, type, note, amount, createdAt, category, categoryColor, categoryIcon } =
+          transaction;
 
         return (
           <ListItem key={id} divider={index < transactions.length - 1} disablePadding>
             <ListItemButton onClick={() => onClickTransaction(transaction)}>
               <ListItemAvatar>
-                <TypeAvatar type={type} />
+                <CategoryAvatar color={categoryColor} icon={categoryIcon} />
               </ListItemAvatar>
               <ListItemText
                 primary={category || 'No category'}

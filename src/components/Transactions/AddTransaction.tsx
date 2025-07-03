@@ -19,7 +19,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { getCategories } from '@/lib/db';
 import { type AddTransactionData, addTransactionSchema } from '@/schemas/transactions';
-import type { CategoryWithoutTotal } from '@/types/categories';
+import type { CategoryAsOption } from '@/types/categories';
 
 type Props = {
   open: boolean;
@@ -45,7 +45,7 @@ function AddTransaction({ open, onClose, onSubmit }: Props) {
   });
   const type = watch('type');
 
-  const [categories, setCategories] = useState<CategoryWithoutTotal[]>([]);
+  const [categories, setCategories] = useState<CategoryAsOption[]>([]);
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === type),
     [type, categories]

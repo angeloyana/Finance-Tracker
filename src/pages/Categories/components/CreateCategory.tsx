@@ -9,9 +9,11 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { MuiColorInput } from 'mui-color-input';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+import IconPicker from '@/components/IconPicker';
 import { type CreateCategoryData, createCategorySchema } from '@/schemas/categories';
 
 type Props = {
@@ -31,6 +33,8 @@ function CreateCategory({ open, onClose, onSubmit }: Props) {
     resolver: zodResolver(createCategorySchema),
     defaultValues: {
       type: 'expense',
+      color: '#1976D2',
+      icon: 'Attach Money',
     },
   });
 
@@ -88,6 +92,26 @@ function CreateCategory({ open, onClose, onSubmit }: Props) {
           error={!!errors.name}
           helperText={errors.name?.message}
           {...register('name')}
+        />
+        <Controller
+          name="color"
+          control={control}
+          render={({ field }) => (
+            <MuiColorInput
+              label="Color"
+              format="hex"
+              isAlphaHidden={true}
+              fallbackValue="#1976D2"
+              error={!!errors.color}
+              helperText={errors.color?.message}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="icon"
+          control={control}
+          render={({ field }) => <IconPicker label="Icon" {...field} />}
         />
       </Box>
     </Dialog>
