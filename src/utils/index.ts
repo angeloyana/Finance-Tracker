@@ -3,6 +3,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import currencies from '@/data/currencies';
 import settings from '@/lib/settings';
+import type { DateRangePreset, StrictDateRange } from '@/types/common';
 
 dayjs.extend(isSameOrAfter);
 
@@ -31,4 +32,25 @@ export function formatDate(date: Dayjs) {
   }
 
   return date.format(fmt);
+}
+
+export function getDateRange(preset: DateRangePreset): StrictDateRange {
+  const now = dayjs();
+  switch (preset) {
+    case 'This Month':
+      return { start: now.startOf('month'), end: now.endOf('month') };
+    case 'Last Month':
+      return {
+        start: now.subtract(1, 'month').startOf('month'),
+        end: now.subtract(1, 'month').endOf('month'),
+      };
+    case 'Last 28 days':
+      return { start: now.subtract(28, 'day'), end: now };
+    case 'Last 60 days':
+      return { start: now.subtract(60, 'day'), end: now };
+    case 'Last 90 days':
+      return { start: now.subtract(90, 'day'), end: now };
+    default:
+      throw new Error(`Unknown preset: ${preset}`);
+  }
 }

@@ -18,14 +18,15 @@ function Overview({ totals }: Props) {
   return (
     <Box sx={{ p: 2, pb: 0 }}>
       <Card variant="outlined">
+        <Box sx={{ p: 2, pb: 0, display: 'flex' }}>
+          <Box sx={{ flex: '1 1 auto' }}>
+            <Typography variant="body2" color="text.secondary">
+              Overview
+            </Typography>
+            <Typography variant="body1">As of {dayjs().format('MMM DD, YYYY')}</Typography>
+          </Box>
+        </Box>
         <CardContent>
-          <Typography variant="body2" component="div" color="text.secondary">
-            Overview
-          </Typography>
-          <Typography variant="body1" component="div">
-            As of {dayjs().format('MMM DD, YYYY')}
-          </Typography>
-
           <PieChart
             series={[
               {
@@ -33,10 +34,11 @@ function Overview({ totals }: Props) {
                   { label: 'Total Expense', color: red[500], value: totals.expense },
                   { label: 'Total Income', color: green[500], value: totals.income },
                 ],
+                innerRadius: 50,
                 valueFormatter: ({ value }) => formatCurrency(value),
               },
             ]}
-            sx={{ height: 170, my: 2 }}
+            sx={{ height: 170, mb: 2 }}
           />
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

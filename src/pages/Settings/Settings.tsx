@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ClearIcon from '@mui/icons-material/Clear';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,6 +16,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import currencies, { type CurrencyCodes } from '@/data/currencies';
 import { backupDatabase, restoreDatabase } from '@/lib/db';
@@ -40,6 +42,7 @@ type SnackbarType = {
 };
 
 function Settings() {
+  const navigate = useNavigate();
   const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false);
   const [currencyCode, setCurrencyCode] = useState(settings.get('currencyCode'));
   const [snackbar, setSnackbar] = useState<SnackbarType>({
@@ -105,6 +108,14 @@ function Settings() {
     <>
       <AppBar>
         <Toolbar>
+          <IconButton
+            aria-label="go back"
+            edge="start"
+            color="inherit"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowBackIcon />
+          </IconButton>
           <Typography variant="h6" component="div">
             Settings
           </Typography>

@@ -9,9 +9,10 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { type BackupData, backupSchema } from '@/schemas/backup';
 import type { CreateCategoryData, UpdateCategoryData } from '@/schemas/categories';
 import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transactions';
+import type { CategoriesTotals, ExpensesVsIncome } from '@/types/analytics';
 import type { Category } from '@/types/categories';
 import type { Totals } from '@/types/common';
-import type { DateRange, DBResult, DBSelect, EntryType } from '@/types/common';
+import type { DateRange, DBResult, DBSelect, EntryType, StrictDateRange } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 
 import { upgrades } from './upgrades';
@@ -233,14 +234,14 @@ export async function getTransactions<T extends DBSelect<Transaction>>(options?:
 }
 
 export async function getTransactionsDateRange(): Promise<DateRange> {
-  const sql = 'SELECT MIN(created_at) AS min, MAX(created_at) AS max FROM transactions';
+  const sql = 'SELECT MIN(created_at) AS start, MAX(created_at) AS end FROM transactions';
   const result = await db!.query(sql);
   const range = result.values?.[0];
 
-  if (!range) return { min: null, max: null };
+  if (!range) return { start: null, end: null };
   return {
-    min: range.min ? dayjs(range.min * 1000) : null,
-    max: range.max ? dayjs(range.max * 1000) : null,
+    start: range.start ? dayjs(range.start * 1000) : null,
+    end: range.end ? dayjs(range.end * 1000) : null,
   };
 }
 
@@ -254,6 +255,41 @@ export async function updateTransaction(id: number, data: UpdateTransactionData)
 export async function deleteTransaction(id: number): Promise<void> {
   const sql = 'DELETE FROM transactions WHERE id = ?';
   await db!.run(sql, [id]);
+}
+
+export async function getCategoriesTotals(
+  type: EntryType,
+  range: StrictDateRange
+): Promise<CategoriesTotals> {
+  const sql = `
+  SELECT
+    c.id,
+    c.name AS label,
+    COALESCE(SUM(t.amount), 0) AS value,
+    c.color
+  FROM categories AS c
+  LEFT JOIN transactions AS t ON t.category_id = c.id
+  WHERE c.type = ? AND t.created_at BETWEEN ? AND ?
+  GROUP BY c.id`;
+  const result = await db!.query(sql, [type, range.start.unix(), range.end.unix()]);
+  return result.values as CategoriesTotals;
+}
+
+export async function getExpensesVsIncome(limit: number): Promise<ExpensesVsIncome> {
+  const sql = `
+  SELECT * FROM (
+    SELECT
+      strftime('%Y-%m', created_at, 'unixepoch') AS month,
+      COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS expenses,
+      COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS income
+    FROM transactions
+    GROUP BY month
+    ORDER BY month DESC
+    LIMIT ?
+  ) as _
+  ORDER BY month ASC`;
+  const result = await db!.query(sql, [limit]);
+  return result.values as ExpensesVsIncome;
 }
 
 export async function backupDatabase(): Promise<BackupData> {

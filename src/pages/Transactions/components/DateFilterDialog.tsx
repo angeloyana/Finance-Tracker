@@ -42,8 +42,8 @@ function DateFilterDialog({ open, value, dateRange, onClose, onChange }: Props) 
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar
             value={internalValue}
-            minDate={dateRange.min ?? undefined}
-            maxDate={dateRange.max ?? undefined}
+            minDate={dateRange.start ?? undefined}
+            maxDate={dateRange.end ?? undefined}
             onChange={(value) => setInternalValue(value)}
             sx={{ width: '100%' }}
           />

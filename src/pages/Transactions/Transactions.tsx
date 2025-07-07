@@ -38,13 +38,13 @@ function Transactions() {
   const [transactionToUpdate, setTransactionToUpdate] = useState<Transaction | null>(null);
 
   const [dateRange, setDateRange] = useState<DateRange>({
-    min: null,
-    max: dayjs(),
+    start: null,
+    end: dayjs(),
   });
   const [filters, setFilters] = useState<Filters>({
     type: null,
     note: '',
-    createdAt: dateRange.max,
+    createdAt: dateRange.end,
   });
   const [typeFilterDialogOpen, setTypeFilterDialogOpen] = useState(false);
   const [dateFilterDialogOpen, setDateFilterDialogOpen] = useState(false);
@@ -53,7 +53,7 @@ function Transactions() {
     getTransactionsDateRange()
       .then((range) => {
         setDateRange(range);
-        setFilters((prev) => ({ ...prev, createdAt: range.max }));
+        setFilters((prev) => ({ ...prev, createdAt: range.end }));
       })
       .catch((err) => console.error(err));
   }, []);
@@ -76,7 +76,7 @@ function Transactions() {
     setFilters((prev) => ({
       ...prev,
       note: value,
-      createdAt: value ? null : dateRange.max,
+      createdAt: value ? null : dateRange.end,
     }));
   };
 

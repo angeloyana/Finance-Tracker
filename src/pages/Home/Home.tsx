@@ -18,6 +18,7 @@ import type { AddTransactionData, UpdateTransactionData } from '@/schemas/transa
 import type { Totals } from '@/types/common';
 import type { Transaction } from '@/types/transactions';
 
+import AppBarMenu from './components/AppBarMenu';
 import HomeFAB from './components/HomeFAB';
 import Overview from './components/Overview';
 
@@ -85,9 +86,10 @@ function Home() {
     <>
       <AppBar>
         <Toolbar>
-          <Typography variant="h6" component="div">
+          <Typography variant="h6" component="div" flexGrow={1}>
             Home
           </Typography>
+          <AppBarMenu />
         </Toolbar>
       </AppBar>
       <Toolbar />

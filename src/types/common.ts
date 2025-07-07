@@ -3,14 +3,26 @@ import type { Dayjs } from 'dayjs';
 export type EntryType = 'expense' | 'income';
 
 export type DateRange = {
-  min: Dayjs | null;
-  max: Dayjs | null;
+  start: Dayjs | null;
+  end: Dayjs | null;
+};
+
+export type StrictDateRange = {
+  start: Dayjs;
+  end: Dayjs;
 };
 
 export type Totals = {
   expense: number;
   income: number;
 };
+
+export type DateRangePreset =
+  | 'This Month'
+  | 'Last Month'
+  | 'Last 28 days'
+  | 'Last 60 days'
+  | 'Last 90 days';
 
 export type DBSelect<T> = Array<Exclude<keyof T, 'id'>>;
 
