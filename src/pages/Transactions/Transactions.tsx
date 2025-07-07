@@ -12,7 +12,6 @@ import UpdateTransaction from '@/components/Transactions/UpdateTransaction';
 import {
   addTransaction,
   deleteTransaction,
-  getTransaction,
   getTransactions,
   getTransactionsDateRange,
   updateTransaction,
@@ -59,18 +58,19 @@ function Transactions() {
   }, []);
 
   useEffect(() => {
+    loadTransactions();
+  }, [filters]);
+
+  const loadTransactions = async () => {
     const where = {
       type: filters.type ?? undefined,
       note: filters.note || undefined,
       createdAt: filters.createdAt ?? undefined,
     };
 
-    getTransactions({ desc: true, where })
-      .then((result) => {
-        setTransactions(result);
-      })
-      .catch((err) => console.error(err));
-  }, [filters]);
+    const result = await getTransactions({ desc: true, where });
+    setTransactions(result);
+  };
 
   const handleSearch = (value: string) => {
     setFilters((prev) => ({
@@ -81,22 +81,18 @@ function Transactions() {
   };
 
   const handleAddTransaction = async (data: AddTransactionData) => {
-    const id = await addTransaction(data);
-    const transaction = (await getTransaction(id))!;
-    setTransactions((prev) => [transaction, ...prev]);
+    await addTransaction(data);
+    await loadTransactions();
   };
 
   const handleUpdateTransaction = async (data: UpdateTransactionData, original: Transaction) => {
     await updateTransaction(original.id, data);
-    const updatedTransaction = (await getTransaction(original.id))!;
-    setTransactions((prev) =>
-      prev.map((tx) => (tx.id !== updatedTransaction.id ? tx : updatedTransaction))
-    );
+    await loadTransactions();
   };
 
   const handleDeleteTransaction = async (original: Transaction) => {
     await deleteTransaction(original.id);
-    setTransactions((prev) => prev.filter((tx) => tx.id !== original.id));
+    await loadTransactions();
   };
 
   return (

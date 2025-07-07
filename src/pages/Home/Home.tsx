@@ -10,7 +10,6 @@ import {
   addTransaction,
   deleteTransaction,
   getTotals,
-  getTransaction,
   getTransactions,
   updateTransaction,
 } from '@/lib/db';
@@ -32,31 +31,28 @@ function Home() {
   const [transactionToUpdate, setTransactionToUpdate] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    Promise.all([getTotals(), getTransactions({ limit: 5, desc: true })]).then(
-      ([result1, result2]) => {
-        setTotals(result1);
-        setTransactions(result2);
-      }
-    );
+    Promise.all([getTotals(), loadTransactions()]).then(([result]) => {
+      setTotals(result);
+    });
   }, []);
 
+  const loadTransactions = async () => {
+    setTransactions(await getTransactions({ limit: 5, desc: true }));
+  };
+
   const handleAddTransaction = async (data: AddTransactionData) => {
-    const id = await addTransaction(data);
-    const transaction = (await getTransaction(id))!;
-    setTransactions((prev) => [transaction, ...(prev.length >= 5 ? prev.slice(0, -1) : prev)]);
+    await addTransaction(data);
+    await loadTransactions();
 
     setTotals((prev) => ({
       ...prev,
-      [transaction.type]: prev[transaction.type] + transaction.amount,
+      [data.type]: prev[data.type] + data.amount,
     }));
   };
 
   const handleUpdateTransaction = async (data: UpdateTransactionData, original: Transaction) => {
     await updateTransaction(original.id, data);
-    const updatedTransaction = (await getTransaction(original.id))!;
-    setTransactions((prev) =>
-      prev.map((tx) => (tx.id !== updatedTransaction.id ? tx : updatedTransaction))
-    );
+    await loadTransactions();
 
     if (data.type !== original.type) {
       setTotals((prev) => ({
@@ -74,7 +70,7 @@ function Home() {
 
   const handleDeleteTransaction = async (original: Transaction) => {
     await deleteTransaction(original.id);
-    setTransactions((prev) => prev.filter((tx) => tx.id !== original.id));
+    await loadTransactions();
 
     setTotals((prev) => ({
       ...prev,
