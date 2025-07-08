@@ -5,6 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ClearIcon from '@mui/icons-material/Clear';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,17 +13,29 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Snackbar from '@mui/material/Snackbar';
+import { useColorScheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import currencies, { type CurrencyCodes } from '@/data/currencies';
+import SelectDialog from '@/components/SelectDialog';
+import currencies, { type CurrencyCode } from '@/data/currencies';
 import { backupDatabase, restoreDatabase } from '@/lib/db';
 import settings from '@/lib/settings';
+import type { ThemeMode } from '@/types/common';
 
-import CurrencyPicker from './components/CurrencyPicker';
+const currencyOptions = Object.entries(currencies).map(([code, { name }]) => ({
+  label: name,
+  value: code as CurrencyCode,
+}));
+
+const themeModeOptions = [
+  { label: 'System', value: 'system' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' },
+] as const;
 
 async function getPermissions(): Promise<boolean> {
   const { publicStorage } = await Filesystem.checkPermissions();
@@ -43,16 +56,27 @@ type SnackbarType = {
 
 function Settings() {
   const navigate = useNavigate();
+  const { setMode } = useColorScheme();
+
   const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false);
   const [currencyCode, setCurrencyCode] = useState(settings.get('currencyCode'));
+  const [themeModePickerOpen, setThemeModePickerOpen] = useState(false);
+  const [themeMode, setThemeMode] = useState(settings.get('themeMode'));
+
   const [snackbar, setSnackbar] = useState<SnackbarType>({
     message: '',
     open: false,
   });
 
-  const handleChangeCurrency = async (value: CurrencyCodes) => {
+  const handleChangeCurrency = async (value: CurrencyCode) => {
     await settings.set('currencyCode', value);
     setCurrencyCode(value);
+  };
+
+  const handleChangeThemeMode = async (value: ThemeMode) => {
+    await settings.set('themeMode', value);
+    setMode(value);
+    setThemeMode(value);
   };
 
   const handleBackup = async () => {
@@ -128,9 +152,18 @@ function Settings() {
             <ListItemText primary="Currency" secondary={currencies[currencyCode].name} />
           </ListItemButton>
         </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => setThemeModePickerOpen(true)}>
+            <ListItemText
+              primary="Theme"
+              secondary={themeModeOptions.find((option) => option.value === themeMode)?.label}
+            />
+          </ListItemButton>
+        </ListItem>
       </List>
+      <Divider />
       <List subheader={<ListSubheader>Backup & Restore</ListSubheader>}>
-        <ListItem disablePadding divider>
+        <ListItem disablePadding>
           <ListItemButton>
             <ListItemText
               primary="Backup"
@@ -157,11 +190,21 @@ function Settings() {
           </ListItemButton>
         </ListItem>
       </List>
-      <CurrencyPicker
+      <SelectDialog
+        title="Select Currency"
         open={currencyPickerOpen}
         value={currencyCode}
-        onClose={() => setCurrencyPickerOpen(false)}
+        options={currencyOptions}
         onChange={handleChangeCurrency}
+        onClose={() => setCurrencyPickerOpen(false)}
+      />
+      <SelectDialog
+        title="Select Theme"
+        open={themeModePickerOpen}
+        value={themeMode}
+        options={themeModeOptions}
+        onChange={handleChangeThemeMode}
+        onClose={() => setThemeModePickerOpen(false)}
       />
       <Snackbar
         open={snackbar.open}

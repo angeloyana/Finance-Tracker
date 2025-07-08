@@ -118,7 +118,7 @@ function Categories() {
           slotProps={{
             indicator: {
               sx: {
-                bgcolor: 'primary.contrastText',
+                bgcolor: 'currentColor',
               },
             },
           }}

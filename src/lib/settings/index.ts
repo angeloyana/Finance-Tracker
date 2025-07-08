@@ -1,9 +1,11 @@
 import { Preferences } from '@capacitor/preferences';
 
-import type { CurrencyCodes } from '@/data/currencies';
+import type { CurrencyCode } from '@/data/currencies';
+import type { ThemeMode } from '@/types/common';
 
 type SettingsType = {
-  currencyCode: CurrencyCodes;
+  currencyCode: CurrencyCode;
+  themeMode: ThemeMode;
 };
 
 class Settings {
@@ -12,12 +14,18 @@ class Settings {
   constructor() {
     this.settings = {
       currencyCode: 'USD',
+      themeMode: 'system',
     };
   }
 
   async init(): Promise<void> {
-    const { value } = await Preferences.get({ key: 'currencyCode' });
-    if (value) this.settings.currencyCode = value as CurrencyCodes;
+    const [{ value: currencyCode }, { value: themeMode }] = await Promise.all([
+      Preferences.get({ key: 'currencyCode' }),
+      Preferences.get({ key: 'themeMode' }),
+    ]);
+
+    if (currencyCode) this.settings.currencyCode = currencyCode as CurrencyCode;
+    if (themeMode) this.settings.themeMode = themeMode as ThemeMode;
   }
 
   async set<T extends keyof SettingsType>(key: T, value: SettingsType[T]): Promise<void> {

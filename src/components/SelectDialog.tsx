@@ -8,49 +8,57 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { useEffect, useState } from 'react';
 
-import currencies, { type CurrencyCodes } from '@/data/currencies';
-
-type Props = {
+type Props<T> = {
+  title: string;
   open: boolean;
-  value: CurrencyCodes;
-  onClose: () => void;
-  onChange: (value: CurrencyCodes) => Promise<void> | void;
+  value: T;
+  options: Readonly<{ label: string; value: T }[]>;
+  onChange?: (value: T) => void;
+  onClose?: () => void;
 };
 
-function CurrencyPicker({ open, value, onClose, onChange }: Props) {
-  const [internalValue, setInternalValue] = useState<CurrencyCodes>(value);
+function SelectDialog<T>({ title, open, value, options, onChange, onClose }: Props<T>) {
+  const [selected, setSelected] = useState<T>(value);
 
   useEffect(() => {
-    if (value !== internalValue) {
-      setInternalValue(value);
-    }
+    setSelected(value);
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInternalValue(e.target.value as CurrencyCodes);
+    setSelected((e.target.value || null) as T);
+  };
+
+  const handleCancel = () => {
+    setSelected(value);
+    onClose?.();
   };
 
   const handleAccept = () => {
-    onChange(internalValue);
-    onClose();
+    onChange?.(selected);
+    onClose?.();
   };
 
   return (
     <Dialog open={open} onClose={onClose} sx={{ '& .MuiDialog-paper': { width: '80%' } }}>
-      <DialogTitle>Select Currency</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
-        <RadioGroup aria-label="currency" value={internalValue} onChange={handleChange}>
-          {Object.entries(currencies).map(([code, value]) => (
-            <FormControlLabel key={code} label={value.name} value={code} control={<Radio />} />
+        <RadioGroup value={selected ?? ''} onChange={handleChange}>
+          {options.map((option) => (
+            <FormControlLabel
+              key={option.label}
+              label={option.label}
+              value={option.value ?? ''}
+              control={<Radio />}
+            />
           ))}
         </RadioGroup>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose()}>Cancel</Button>
+        <Button onClick={handleCancel}>Cancel</Button>
         <Button onClick={handleAccept}>OK</Button>
       </DialogActions>
     </Dialog>
   );
 }
 
-export default CurrencyPicker;
+export default SelectDialog;

@@ -41,6 +41,6 @@ const currencies = {
   VND: { name: 'Vietnamese Dong', locale: 'vi-VN' },
 } as const;
 
-export type CurrencyCodes = keyof typeof currencies;
+export type CurrencyCode = keyof typeof currencies;
 
 export default currencies;

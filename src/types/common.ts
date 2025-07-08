@@ -27,3 +27,5 @@ export type DateRangePreset =
 export type DBSelect<T> = Array<Exclude<keyof T, 'id'>>;
 
 export type DBResult<T extends { id: number }, U extends DBSelect<T>> = Pick<T, 'id' | U[number]>;
+
+export type ThemeMode = 'system' | 'light' | 'dark';

@@ -6,6 +6,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 
+import SelectDialog from '@/components/SelectDialog';
 import AddTransaction from '@/components/Transactions/AddTransaction';
 import TransactionsList from '@/components/Transactions/TransactionsList';
 import UpdateTransaction from '@/components/Transactions/UpdateTransaction';
@@ -23,13 +24,18 @@ import type { Transaction } from '@/types/transactions';
 import DateFilterDialog from './components/DateFilterDialog';
 import SearchBar from './components/SearchBar';
 import TransactionsFAB from './components/TransactionsFAB';
-import TypeFilterDialog from './components/TypeFilterDialog';
 
 type Filters = {
   type: EntryType | null;
   note: string;
   createdAt: Dayjs | null;
 };
+
+const typeFilterOptions = [
+  { label: 'Any', value: null },
+  { label: 'Expense', value: 'expense' },
+  { label: 'Income', value: 'income' },
+] as const;
 
 function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -135,9 +141,11 @@ function Transactions() {
         onDelete={handleDeleteTransaction}
         onSubmit={handleUpdateTransaction}
       />
-      <TypeFilterDialog
+      <SelectDialog
+        title="Select Type"
         open={typeFilterDialogOpen}
         value={filters.type}
+        options={typeFilterOptions}
         onChange={(value) => setFilters((prev) => ({ ...prev, type: value }))}
         onClose={() => setTypeFilterDialogOpen(false)}
       />
