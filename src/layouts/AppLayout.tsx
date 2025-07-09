@@ -9,7 +9,7 @@ import { Link, Outlet, useLocation } from 'react-router';
 
 function NavigationBar() {
   const routes = [
-    { label: 'Home', path: '/home', icon: <HomeIcon /> },
+    { label: 'Home', path: '/', icon: <HomeIcon /> },
     { label: 'Categories', path: '/categories', icon: <CategoryIcon /> },
     { label: 'Analytics', path: '/analytics', icon: <BarChartIcon /> },
     { label: 'Transactions', path: '/transactions', icon: <ReceiptIcon /> },

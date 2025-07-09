@@ -1,7 +1,6 @@
 import '@/global.css';
 
 import { Capacitor } from '@capacitor/core';
-import { SplashScreen } from '@capacitor/splash-screen';
 import { defineCustomElements as jeepSqlite } from 'jeep-sqlite/loader';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -23,7 +22,6 @@ import App from './App.tsx';
   await initDatabase();
   window.addEventListener('beforeunload', closeDatabase);
 
-  await SplashScreen.hide();
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
