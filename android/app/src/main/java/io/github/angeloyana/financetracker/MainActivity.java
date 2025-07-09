@@ -1,4 +1,4 @@
-package com.angeloyana.financetracker;
+package io.github.angeloyana.financetracker;
 
 import com.getcapacitor.BridgeActivity;
 

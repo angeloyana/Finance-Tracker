@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Finance Tracker</string>
     <string name="title_activity_main">Finance Tracker</string>
-    <string name="package_name">com.angeloyana.financetracker</string>
-    <string name="custom_url_scheme">com.angeloyana.financetracker</string>
+    <string name="package_name">io.github.angeloyana.financetracker</string>
+    <string name="custom_url_scheme">io.github.angeloyana.financetracker</string>
 </resources>
