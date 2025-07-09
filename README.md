@@ -12,7 +12,11 @@ visualize your financial habits — all in one place.
 - Visualize data with built-in analytics
 - Quickly find past transactions using built-in search and filter options.
 
-## Screenshots
+## ⬇️ Installation
+
+Build from source or download the prebuilt APK from the [latest Github release](https://github.com/angeloyana/finance-tracker/releases/latest).
+
+## 📷 Screenshots
 
 <div align="center">
   <table>
