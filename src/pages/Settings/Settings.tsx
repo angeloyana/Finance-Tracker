@@ -26,6 +26,8 @@ import { backupDatabase, restoreDatabase } from '@/lib/db';
 import settings from '@/lib/settings';
 import type { ThemeMode } from '@/types/common';
 
+import LoadingDialog from './components/LoadingDialog';
+
 const currencyOptions = Object.entries(currencies).map(([code, { name }]) => ({
   label: name,
   value: code as CurrencyCode,
@@ -63,6 +65,11 @@ function Settings() {
   const [themeModePickerOpen, setThemeModePickerOpen] = useState(false);
   const [themeMode, setThemeMode] = useState(settings.get('themeMode'));
 
+  const [loadingDialogProps, setLoadingDialogProps] = useState({
+    title: '',
+    message: '',
+    open: false,
+  });
   const [snackbar, setSnackbar] = useState<SnackbarType>({
     message: '',
     open: false,
@@ -85,6 +92,11 @@ function Settings() {
       return;
     }
 
+    setLoadingDialogProps({
+      title: 'Backup',
+      message: 'Saving backup, please wait...',
+      open: true,
+    });
     const backupData = await backupDatabase();
     const { uri } = await Filesystem.writeFile({
       data: JSON.stringify(backupData),
@@ -92,6 +104,7 @@ function Settings() {
       directory: Directory.ExternalStorage,
       encoding: Encoding.UTF8,
     });
+    setLoadingDialogProps((prev) => ({ ...prev, open: false }));
     setSnackbar({ message: `Saved to ${uri.replace(/^file:\/\//, '')}`, open: true });
   };
 
@@ -108,6 +121,11 @@ function Settings() {
     const file = result.files[0];
     if (!file) return;
 
+    setLoadingDialogProps({
+      title: 'Restore',
+      message: 'Restoring backup, please wait...',
+      open: true,
+    });
     let data: string;
     if (Capacitor.getPlatform() === 'web') {
       data = await file.blob!.text();
@@ -126,6 +144,7 @@ function Settings() {
       console.error(err);
       setSnackbar({ message: 'Invalid backup file', open: true });
     }
+    setLoadingDialogProps((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -206,6 +225,7 @@ function Settings() {
         onChange={handleChangeThemeMode}
         onClose={() => setThemeModePickerOpen(false)}
       />
+      <LoadingDialog {...loadingDialogProps} />
       <Snackbar
         open={snackbar.open}
         message={snackbar.message}
